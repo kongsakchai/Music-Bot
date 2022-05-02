@@ -2,7 +2,6 @@ import { Message, TextBasedChannels } from "discord.js";
 import Player from "../Class/player";
 import button from "../Views/button";
 import { addEmbed, nowEmbed, playEmbed, setupEmbed } from "../Views/embed.view";
-import { createSetup } from "./setup.controller";
 import { Song } from "./song.controller";
 
 const sendSetup = async (channel: TextBasedChannels): Promise<Message> => {

@@ -9,8 +9,9 @@ export {
 	token
 }
 */
+//ffmpeg-static
 
-import { Client, Intents, Interaction, MessageComponentInteraction } from 'discord.js'
+import { Client, Intents, Interaction } from 'discord.js'
 import { hasChannel, loadSetup } from './Controllers/setup.controller';
 import { nowCommand, playCommand, removeAtCommand, setupCommand, skipCommand, stopCommand } from './Controllers/command.controller';
 import { getPlyaer } from './Controllers/players.controller';
@@ -34,7 +35,6 @@ client.once("disconnect", () => {
 client.on("messageCreate", (message) => {
 
 	if (!message.content.startsWith(prefix)) {
-		console.log(message.guildId!, message.channelId);
 		if (hasChannel(message.guildId!, message.channelId) && !message.author.bot)
 			playCommand(message);
 		return;

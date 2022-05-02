@@ -11,8 +11,7 @@ export const setupEmbed = (player: Player | undefined = undefined): MessageEmbed
         embed.setThumbnail('https://i.imgur.com/FYKZr04.jpeg')
     } else {
         embed.setTitle('อาตมาจะแสดงธรรมเทศนาเรื่อง')
-        embed.setDescription(`[${player.songNow?.title}](${player.songNow?.url})\n ${getTime(player.songNow?.time)}`);
-        embed.addField(``, `ขอโดย โยม<@!${player.songNow?.user}>`, false)
+        embed.setDescription(`[${player.songNow?.title}](${player.songNow?.url})\n${getTime(player.songNow?.time)}\nขอโดย โยม<@!${player.songNow?.user}>`);
 
         if (player.songList && player.songList.length > 0) {
             let str = player.songList.map((song: Song, i: number) => {
@@ -31,8 +30,7 @@ export const playEmbed = (song: Song): MessageEmbed => {
     const embed = new MessageEmbed()
     embed.setColor('#0099ff')
     embed.setTitle('อาตมาจะแสดงธรรมเทศนาเรื่อง')
-    embed.setDescription(`[${song.title}](${song.url})\n ${getTime(song.time)}`);
-    embed.addField(`\u200B`, `ขอโดย โยม<@!${song.user}>`, false)
+    embed.setDescription(`[${song.title}](${song.url})\n ${getTime(song.time)}\nขอโดย โยม<@!${song.user}>`);
     if (song.display) embed.setThumbnail(song.display);
     return embed;
 
@@ -43,8 +41,7 @@ export const addEmbed = (song: Song): MessageEmbed => {
     const embed = new MessageEmbed()
     embed.setColor('#0099ff')
     embed.setTitle('เพิ่มธรรมะเรื่อง')
-    embed.setDescription(`[${song.title}](${song.url})\n ${getTime(song.time)}`);
-    embed.addField(`\u200B`, `ขอโดย โยม<@!${song.user}>`, false)
+    embed.setDescription(`[${song.title}](${song.url})\n ${getTime(song.time)}\nขอโดย โยม<@!${song.user}>`);
     if (song.display) embed.setThumbnail(song.display);
     return embed;
 
@@ -55,7 +52,7 @@ export const nowEmbed = (song: Song, songList: Song[]): MessageEmbed => {
     const embed = new MessageEmbed()
     embed.setColor('#0099ff')
     embed.setTitle('กำลังเทศน์')
-    embed.setDescription(`[${song.title}](${song.url})\n ขอโดย โยม<@!${song.user}> `);
+    embed.setDescription(`[${song.title}](${song.url})\n ${getTime(song.time)}\nขอโดย โยม<@!${song.user}>`);
 
     if (songList && songList.length > 0) {
         let str = songList.map((song: Song, i: number) => {

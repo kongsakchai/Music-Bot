@@ -1,7 +1,7 @@
 import Player from '../Class/player'
-import { Guild, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
-import { createSetup, getSetup, hasSetup, Setup } from './setup.controller';
-import { sendSetup } from './send.controller';
+import { Guild, Message, StageChannel, VoiceChannel } from "discord.js";
+import { createSetup, getSetup, Setup } from './setup.controller';
+import { sendSetup, updateSetup } from './send.controller';
 
 const players = new Map<string, Player>();
 
@@ -9,16 +9,12 @@ const getMessage = async (guild: Guild, setup: Setup): Promise<Message | null> =
     try {
         const channel = await guild.channels.fetch(setup.channel);
         if (!channel || !channel.isText()) return null;
-        console.log("Channel Clear");
-
         try {
             const message = await channel.messages.fetch(setup.message);
-            console.log("Message Clear");
             return message;
         } catch {
             const setup = await sendSetup(channel);
             createSetup(setup.guildId!, setup.channelId, setup.id);
-            console.log("New Message Clear");
             return setup;
         }
 
@@ -30,7 +26,8 @@ const getMessage = async (guild: Guild, setup: Setup): Promise<Message | null> =
 const createPlayer = async (voiceChannel: VoiceChannel | StageChannel) => {
 
     const player = new Player(voiceChannel, (p: Player) => {
-        players.delete(p.id)
+        updateSetup(p);
+        p.stop();
     });
 
     const setup = getSetup(voiceChannel.guildId)
