@@ -5,20 +5,21 @@ const prefix: string = '-';
 const token: string = '';
 
 export {
-    prefix,
-    token
+	prefix,
+	token
 }
 */
 
-import { Client, Intents } from 'discord.js'
-import { loopCommand, playCommand, queueCommand, removeCommand, skipCommand, stopCommand } from './Controllers/message.controller';
-import { read, addList, hasList, list } from './Controllers/read.controller';
+import { Client, Intents, Interaction, MessageComponentInteraction } from 'discord.js'
+import { hasChannel, loadSetup } from './Controllers/setup.controller';
+import { nowCommand, playCommand, removeAtCommand, setupCommand, skipCommand, stopCommand } from './Controllers/command.controller';
+import { getPlyaer } from './Controllers/players.controller';
 
 
 const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 
 client.once("ready", () => {
-	read();
+	loadSetup();
 	console.log("Ready!");
 });
 
@@ -31,30 +32,46 @@ client.once("disconnect", () => {
 });
 
 client.on("messageCreate", (message) => {
-	console.log(message.channelId);
 
 	if (!message.content.startsWith(prefix)) {
-		if (hasList(message.channelId) && !message.author.bot)
+		if (hasChannel(message.guildId!, message.channelId) && !message.author.bot)
 			playCommand(message);
 		return;
 	}
 
-	if (message.content.startsWith(prefix + 'p ') || message.content.startsWith(prefix + 'play '))
+	if (message.content === (prefix + 'setup'))
+		setupCommand(message);
+	else if (message.content.startsWith(prefix + 'p ') || message.content.startsWith(prefix + 'play '))
 		playCommand(message);
-	else if (message.content.startsWith(prefix + 'r '))
-		removeCommand(message);
+	else if (message.content.startsWith(prefix + 'r ') || message.content.startsWith(prefix + 'remove '))
+		removeAtCommand(message);
+	else if (message.content == (prefix + 'r') || message.content == (prefix + 'remove'))
+		removeAtCommand(message);
 	else if (message.content === (prefix + 'stop'))
 		stopCommand(message);
 	else if (message.content === (prefix + 's') || message.content === (prefix + 'skip'))
 		skipCommand(message);
 	else if (message.content === (prefix + 'q'))
-		queueCommand(message);
-	else if (message.content === (prefix + 'read'))
-		addList(message.channelId);
-	else if (message.content === (prefix + 'loop'))
-		loopCommand(message);
-	/*else if (message.content === (prefix + '-show'))
-		showCommand(message);*/
+		nowCommand(message);
+});
+
+client.on('interactionCreate', (interaction: Interaction) => {
+
+	if (interaction.isButton()) {
+
+		const player = getPlyaer(interaction.guildId!)
+		if (!player) return;
+
+		if (interaction.customId == 'skip') {
+			player.next();
+		} else if (interaction.customId == 'stop') {
+			player.stop();
+		} else if (interaction.customId == 'delete') {
+			player.remove();
+		}
+
+	}
+
 });
 
 client.login(token);
