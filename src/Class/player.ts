@@ -67,8 +67,8 @@ export default class Player {
             clearTimeout(this.countdown);
             this.countdown = null;
             await this.play();
-            if (this.setup) updateSetup(this);
         }
+        if (this.setup) updateSetup(this);
     }
 
     async play() {
@@ -97,6 +97,7 @@ export default class Player {
         if (!i) {
             if (this.songList.length >= 1) {
                 this.songList.pop();
+                if (this.setup) updateSetup(this);
                 return true;
             }
             return false;

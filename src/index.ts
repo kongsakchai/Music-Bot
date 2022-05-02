@@ -34,6 +34,7 @@ client.once("disconnect", () => {
 client.on("messageCreate", (message) => {
 
 	if (!message.content.startsWith(prefix)) {
+		console.log(message.guildId!, message.channelId);
 		if (hasChannel(message.guildId!, message.channelId) && !message.author.bot)
 			playCommand(message);
 		return;
@@ -69,6 +70,7 @@ client.on('interactionCreate', (interaction: Interaction) => {
 		} else if (interaction.customId == 'delete') {
 			player.remove();
 		}
+		interaction.deferUpdate();
 
 	}
 

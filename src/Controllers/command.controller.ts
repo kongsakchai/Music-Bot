@@ -59,6 +59,7 @@ const playCommand = async (message: Message) => {
     } catch {
 
     }
+    message.delete();
 }
 
 const skipCommand = async (message: Message) => {
@@ -140,10 +141,8 @@ const removeCommand = async (message: Message) => {
 
     if (player) {
         const ok2 = await player.remove();
-        if (ok2) {
-            if (player.setup)
-                updateSetup(player);
-            else if (player.songNow)
+        if (ok2 && !player.setup) {
+            if (player.songNow)
                 sendNow(message.channel, player.songNow, player.songList);
             else
                 message.reply("อาตมาไม่มีเรื่องจะพูดแล้ว")

@@ -12,7 +12,7 @@ export const setupEmbed = (player: Player | undefined = undefined): MessageEmbed
     } else {
         embed.setTitle('อาตมาจะแสดงธรรมเทศนาเรื่อง')
         embed.setDescription(`[${player.songNow?.title}](${player.songNow?.url})\n ${getTime(player.songNow?.time)}`);
-        embed.addField(`\u200B`, `ขอโดย โยม<@!${player.songNow?.user}>`, false)
+        embed.addField(``, `ขอโดย โยม<@!${player.songNow?.user}>`, false)
 
         if (player.songList && player.songList.length > 0) {
             let str = player.songList.map((song: Song, i: number) => {
