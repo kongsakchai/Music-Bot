@@ -10,7 +10,7 @@ export default class Player {
     conection: VoiceConnection;
     audioPlayer: AudioPlayer;
     songList: Song[] = [];
-    countdown: any = null;
+    countdown: NodeJS.Timeout | undefined = undefined;
     message: Message | null = null;
     setup: boolean = false;
     songNow: Song | undefined;
@@ -34,12 +34,19 @@ export default class Player {
         this.audioPlayer.on(AudioPlayerStatus.Idle, (_old, _new) => {
 
             if (_old.status == AudioPlayerStatus.Playing && _new.status == AudioPlayerStatus.Idle) {
-                this.next();
+                if (this.songNow) this.next();
             }
         });
 
         this.conection.subscribe(this.audioPlayer);
-        this.countdown = setTimeout(() => { this.conection.disconnect(); }, 600_000);
+    }
+
+    setCountdown() {
+        if (this.countdown) clearTimeout(this.countdown);
+        this.countdown = setTimeout(() => {
+            console.log('Time out')
+            this.conection.disconnect();
+        }, 600_000);
     }
 
     onSetup(message: Message) {
@@ -47,53 +54,48 @@ export default class Player {
         this.message = message;
     }
 
-    async next() {
+    next() {
+
         if (this.songList.length > 0) {
-            await this.play();
-            if (this.setup) updateSetup(this);
+            this.play();
         }
         else {
-            this.audioPlayer.stop();
             this.songNow = undefined;
-            this.countdown = setTimeout(() => { this.conection.disconnect(); }, 600_000);
-            if (this.setup) updateSetup(this);
+            this.setCountdown();
+            this.audioPlayer.stop();
         }
+
+        if (this.setup) updateSetup(this);
+
     }
 
-    async addSong(song: Song) {
-
+    addSong(song: Song) {
+        if (this.countdown) clearTimeout(this.countdown);
         this.songList.push(song);
-        if (this.countdown) {
-            clearTimeout(this.countdown);
-            this.countdown = null;
-            await this.play();
-        }
+        if (!this.songNow) this.play();
         if (this.setup) updateSetup(this);
     }
 
-    async play() {
+    play() {
+
         try {
-            if (this.songList.length > 0) {
+            const song = this.songList.shift();
+            this.songNow = song;
 
-                const song = this.songList.shift();
+            const yt = ytdl(song!!.url, {
+                quality: "highestaudio",
+                filter: "audioonly",
+                highWaterMark: 1 << 25,
+            });
 
-                const yt = ytdl(song!!.url, {
-                    quality: "highestaudio",
-                    filter: "audioonly",
-                    highWaterMark: 1 << 25,
-                });
-
-                const resource = createAudioResource(yt);
-                this.audioPlayer.play(resource);
-                this.songNow = song;
-
-            }
+            const resource = createAudioResource(yt);
+            this.audioPlayer.play(resource);
         } catch {
             this.next();
         }
     }
 
-    async remove(i: number | undefined = undefined): Promise<boolean> {
+    remove(i: number | undefined = undefined): boolean {
         if (!i) {
             if (this.songList.length >= 1) {
                 this.songList.pop();
@@ -104,16 +106,21 @@ export default class Player {
         }
         else if (this.songList.length >= i) {
             this.songList.splice(i - 1, 1);
+            if (this.setup) updateSetup(this);
             return true;
         } else {
             return false;
         }
     }
 
-    async stop() {
+    stop() {
         this.songList = [];
-        await this.next();
+        this.next();
         if (this.setup) updateSetup(this);
+    }
+
+    dis(){
+        this.conection.disconnect();
     }
 
 }

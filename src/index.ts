@@ -13,7 +13,7 @@ export {
 
 import { Client, Intents, Interaction } from 'discord.js'
 import { hasChannel, loadSetup } from './Controllers/setup.controller';
-import { nowCommand, playCommand, removeAtCommand, setupCommand, skipCommand, stopCommand } from './Controllers/command.controller';
+import { disconnectCommand, nowCommand, playCommand, removeAtCommand, setupCommand, skipCommand, stopCommand } from './Controllers/command.controller';
 import { getPlyaer } from './Controllers/players.controller';
 
 
@@ -54,6 +54,8 @@ client.on("messageCreate", (message) => {
 		skipCommand(message);
 	else if (message.content === (prefix + 'q'))
 		nowCommand(message);
+	else if (message.content === (prefix + 'dis'))
+		disconnectCommand(message);
 });
 
 client.on('interactionCreate', (interaction: Interaction) => {
@@ -61,14 +63,15 @@ client.on('interactionCreate', (interaction: Interaction) => {
 	if (interaction.isButton()) {
 
 		const player = getPlyaer(interaction.guildId!)
-		if (!player) return;
+		if (player) {
 
-		if (interaction.customId == 'skip') {
-			player.next();
-		} else if (interaction.customId == 'stop') {
-			player.stop();
-		} else if (interaction.customId == 'delete') {
-			player.remove();
+			if (interaction.customId == 'skip') {
+				player.next();
+			} else if (interaction.customId == 'stop') {
+				player.stop();
+			} else if (interaction.customId == 'delete') {
+				player.remove();
+			}
 		}
 		interaction.deferUpdate();
 

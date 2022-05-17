@@ -47,7 +47,7 @@ const playCommand = async (message: Message) => {
         if (!song) return;
 
         song.user = message.author.id;
-        await player.addSong(song);
+        player.addSong(song);
 
         if (!player.setup) {
             if (player.songList.length > 0)
@@ -70,8 +70,8 @@ const skipCommand = async (message: Message) => {
     const id = voiceChannel.guildId;
     let player = getPlyaer(id);
 
-    if (player) {
-        await player.next();
+    if (player && player.songNow) {
+        player.next();
 
         if (!player.setup && player.songNow)
             sendPlay(message.channel, player.songNow);
@@ -86,8 +86,8 @@ const stopCommand = async (message: Message) => {
     const id = voiceChannel.guildId;
     let player = getPlyaer(id);
 
-    if (player) {
-        await player.stop();
+    if (player && player.songNow) {
+        player.stop();
     }
 }
 
@@ -120,8 +120,8 @@ const removeAtCommand = async (message: Message) => {
     const [ok, num] = tryPasre(value);
 
     if (player && ok) {
-        const ok2 = await player.remove(num);
-        if (ok2) {
+        const ok = player.remove(num);
+        if (ok) {
             if (player.setup)
                 updateSetup(player);
             else if (player.songNow)
@@ -140,13 +140,25 @@ const removeCommand = async (message: Message) => {
     let player = getPlyaer(id);
 
     if (player) {
-        const ok2 = await player.remove();
-        if (ok2 && !player.setup) {
+        const ok = player.remove();
+        if (ok && !player.setup) {
             if (player.songNow)
                 sendNow(message.channel, player.songNow, player.songList);
             else
                 message.reply("อาตมาไม่มีเรื่องจะพูดแล้ว")
         }
+    }
+}
+
+const disconnectCommand = async (message: Message) => {
+    const voiceChannel = getVoiceChannel(message.member!);
+    if (!voiceChannel) return;
+
+    const id = voiceChannel.guildId;
+    let player = getPlyaer(id);
+
+    if (player) {
+        player.dis();
     }
 }
 
@@ -159,4 +171,4 @@ const tryPasre = (str: string): [boolean, number] => {
     }
 }
 
-export { playCommand, setupCommand, skipCommand, stopCommand, removeAtCommand, removeCommand, nowCommand }
+export { playCommand, setupCommand, skipCommand, stopCommand, removeAtCommand, removeCommand, nowCommand,disconnectCommand }
