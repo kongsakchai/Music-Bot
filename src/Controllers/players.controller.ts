@@ -5,6 +5,12 @@ import { sendSetup, updateSetup } from './send.controller';
 
 const players = new Map<string, Player>();
 
+interface Detail {
+    _name: string,
+    _status: string,
+    _timeout: string
+}
+
 const getMessage = async (guild: Guild, setup: Setup): Promise<Message | null> => {
     try {
         const channel = await guild.channels.fetch(setup.channel);
@@ -39,7 +45,7 @@ const createPlayer = async (voiceChannel: VoiceChannel | StageChannel) => {
     return player;
 }
 
-const getPlyaer = (id: string): Player | undefined => {
+const getPlayer = (id: string): Player | undefined => {
 
     if (players.has(id))
         return players.get(id)
@@ -47,4 +53,21 @@ const getPlyaer = (id: string): Player | undefined => {
     return undefined;
 };
 
-export { createPlayer, getPlyaer };
+const getPlayerDetail = (): Detail[] => {
+
+    const data: Detail[] = []
+    players.forEach((value: Player, key: string, map: Map<string, Player>) => {
+
+        data.push({
+            _name: value._name,
+            _status: value._time.message,
+            _timeout: value._time.time
+        })
+
+    })
+
+    return data;
+
+}
+
+export { createPlayer, getPlayer, getPlayerDetail };

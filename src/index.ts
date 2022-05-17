@@ -1,21 +1,10 @@
 import { token, prefix } from './config'
 
-/*
-const prefix: string = '-';
-const token: string = '';
-
-export {
-	prefix,
-	token
-}
-*/
-//ffmpeg-static
-
 import { Client, Intents, Interaction } from 'discord.js'
 import { hasChannel, loadSetup } from './Controllers/setup.controller';
 import { disconnectCommand, nowCommand, playCommand, removeAtCommand, setupCommand, skipCommand, stopCommand } from './Controllers/command.controller';
-import { getPlyaer } from './Controllers/players.controller';
-
+import { getPlayer, getPlayerDetail } from './Controllers/players.controller';
+import express, { Application, Request, Response } from 'express';
 
 const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 
@@ -62,7 +51,7 @@ client.on('interactionCreate', (interaction: Interaction) => {
 
 	if (interaction.isButton()) {
 
-		const player = getPlyaer(interaction.guildId!)
+		const player = getPlayer(interaction.guildId!)
 		if (player) {
 
 			if (interaction.customId == 'skip') {
@@ -80,3 +69,15 @@ client.on('interactionCreate', (interaction: Interaction) => {
 });
 
 client.login(token);
+
+//-------------------------------------------
+
+const app: Application = express()
+
+app.get("/list", (req: Request, res: Response) => {
+
+	res.send(200).json(getPlayerDetail());
+
+});
+
+app.listen(3000);

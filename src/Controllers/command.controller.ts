@@ -1,6 +1,6 @@
 import { GuildMember, Message, StageChannel, VoiceChannel } from "discord.js";
 import { prefix } from "../config";
-import { createPlayer, getPlyaer } from "./players.controller";
+import { createPlayer, getPlayer } from "./players.controller";
 import { sendAdd, sendNow, sendPlay, sendSetup, updateSetup } from "./send.controller";
 import { createSetup } from "./setup.controller";
 import { searchSong } from "./song.controller";
@@ -34,7 +34,7 @@ const playCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     if (!player) {
         player = await createPlayer(voiceChannel);
@@ -68,7 +68,7 @@ const skipCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     if (player && player.songNow) {
         player.next();
@@ -84,7 +84,7 @@ const stopCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     if (player && player.songNow) {
         player.stop();
@@ -97,7 +97,7 @@ const nowCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     if (player) {
         if (player.setup)
@@ -114,7 +114,7 @@ const removeAtCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     const value = getValue(message.content);
     const [ok, num] = tryPasre(value);
@@ -137,7 +137,7 @@ const removeCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     if (player) {
         const ok = player.remove();
@@ -155,7 +155,7 @@ const disconnectCommand = async (message: Message) => {
     if (!voiceChannel) return;
 
     const id = voiceChannel.guildId;
-    let player = getPlyaer(id);
+    let player = getPlayer(id);
 
     if (player) {
         player.dis();

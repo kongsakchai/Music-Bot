@@ -7,6 +7,8 @@ import { updateSetup } from '../Controllers/send.controller';
 export default class Player {
 
     id: string;
+    _name: string;
+    _time: { message: string, time: string };
     conection: VoiceConnection;
     audioPlayer: AudioPlayer;
     songList: Song[] = [];
@@ -18,6 +20,11 @@ export default class Player {
 
     constructor(voiceChannel: VoiceChannel | StageChannel, disconnectCallback: (player: Player) => void) {
         this.id = voiceChannel.guildId;
+        this._name = voiceChannel.name;
+
+        const date = new Date();
+        this._time = { message: "start", time: date.toLocaleTimeString() }
+
         this.conection = joinVoiceChannel({
             channelId: voiceChannel.id,
             guildId: voiceChannel.guildId,
@@ -42,7 +49,10 @@ export default class Player {
     }
 
     setCountdown() {
-        if (this.countdown) clearTimeout(this.countdown);
+        if (this.countdown != undefined) clearTimeout(this.countdown);
+        const date = new Date();
+        this._time = { message: "end", time: date.toLocaleTimeString() }
+
         this.countdown = setTimeout(() => {
             console.log('Time out')
             this.conection.disconnect();
@@ -70,13 +80,17 @@ export default class Player {
     }
 
     addSong(song: Song) {
-        if (this.countdown) clearTimeout(this.countdown);
         this.songList.push(song);
+
+        if (this.countdown != undefined) clearTimeout(this.countdown);
         if (!this.songNow) this.play();
         if (this.setup) updateSetup(this);
     }
 
     play() {
+
+        const date = new Date();
+        this._time = { message: "start", time: date.toLocaleTimeString() }
 
         try {
             const song = this.songList.shift();
@@ -119,7 +133,7 @@ export default class Player {
         if (this.setup) updateSetup(this);
     }
 
-    dis(){
+    dis() {
         this.conection.disconnect();
     }
 
