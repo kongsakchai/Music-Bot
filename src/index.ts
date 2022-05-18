@@ -76,7 +76,7 @@ const app: Application = express()
 
 app.get("/list", (req: Request, res: Response) => {
 
-	res.send(200).json(getPlayerDetail());
+	res.status(200).json(getPlayerDetail());
 
 });
 

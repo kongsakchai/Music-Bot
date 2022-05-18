@@ -33,7 +33,7 @@ const createPlayer = async (voiceChannel: VoiceChannel | StageChannel) => {
 
     const player = new Player(voiceChannel, (p: Player) => {
         updateSetup(p);
-        p.stop();
+        players.delete(p.id)
     });
 
     const setup = getSetup(voiceChannel.guildId)
